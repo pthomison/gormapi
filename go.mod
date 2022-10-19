@@ -3,8 +3,8 @@ module github.com/pthomison/gormapi
 go 1.19
 
 require (
-	github.com/pthomison/dbutils v0.0.5
-	github.com/pthomison/errcheck v0.0.1
+	github.com/pthomison/dbutils v0.0.6
+	github.com/pthomison/errcheck v0.0.2
 )
 
 require (
