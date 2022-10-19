@@ -1,6 +1,7 @@
 package gormapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,7 +69,7 @@ func TestIndex(t *testing.T) {
 	errcheck.CheckTest(err, t)
 
 	if len(objs) != len(index) {
-		errcheck.CheckTest(errors.New("mismatch in index data lengths"), t)
+		errcheck.CheckTest(errors.New("mismatch in index(func) data lengths"), t)
 	}
 
 	checkData := make([]IDView, testObjCount)
@@ -84,7 +85,72 @@ func TestIndex(t *testing.T) {
 		fmt.Println(string(checkJson))
 		fmt.Println(string(indexBytes))
 
-		errcheck.CheckTest(errors.New("mismatch in index return data"), t)
+		errcheck.CheckTest(errors.New("mismatch in index(func) return data"), t)
+	}
+
+}
+
+func TestAll(t *testing.T) {
+
+	client := createTestData()
+
+	objs := dbutils.SelectAll[gormObject](client)
+	objsJSON, err := json.Marshal(objs)
+	errcheck.CheckTest(err, t)
+
+	ts := httptest.NewServer(http.HandlerFunc(All[gormObject](client)))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	errcheck.CheckTest(err, t)
+
+	resBytes, err := io.ReadAll(res.Body)
+	res.Body.Close()
+	errcheck.CheckTest(err, t)
+
+	resultObjs := make([]gormObject, testObjCount)
+	err = json.Unmarshal(resBytes, &resultObjs)
+	errcheck.CheckTest(err, t)
+
+	if len(objs) != len(resultObjs) {
+		errcheck.CheckTest(errors.New("mismatch in all(func) data lengths"), t)
+	}
+
+	if bytes.Compare(resBytes, objsJSON) != 0 {
+		fmt.Println(string(resBytes))
+		fmt.Println(string(objsJSON))
+
+		errcheck.CheckTest(errors.New("mismatch in all(func) return data"), t)
+	}
+
+}
+
+func TestID(t *testing.T) {
+
+	testIndex := 4
+
+	client := createTestData()
+
+	objs := dbutils.SelectAll[gormObject](client)
+	obj := objs[testIndex-1]
+	objJSON, err := json.Marshal(obj)
+	errcheck.CheckTest(err, t)
+
+	ts := httptest.NewServer(http.HandlerFunc(ID[gormObject](client)))
+	defer ts.Close()
+
+	res, err := http.Get(fmt.Sprintf("%v/id/%v", ts.URL, testIndex))
+	errcheck.CheckTest(err, t)
+
+	resBytes, err := io.ReadAll(res.Body)
+	res.Body.Close()
+	errcheck.CheckTest(err, t)
+
+	if bytes.Compare(resBytes, objJSON) != 0 {
+		fmt.Println(string(resBytes))
+		fmt.Println(string(objJSON))
+
+		errcheck.CheckTest(errors.New("mismatch in id(func) return data"), t)
 	}
 
 }
