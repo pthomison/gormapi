@@ -53,7 +53,7 @@ func TestIndex(t *testing.T) {
 
 	objs := dbutils.SelectAll[gormObject](client)
 
-	ts := httptest.NewServer(http.HandlerFunc(Index(client, &gormObject{})))
+	ts := httptest.NewServer(http.HandlerFunc(Index[gormObject](client)))
 	defer ts.Close()
 
 	res, err := http.Get(ts.URL)
