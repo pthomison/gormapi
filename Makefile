@@ -12,4 +12,4 @@ rev_release:
 	git push origin $(shell exoskeleton rev -i $(CURRENT_TAG))
 
 release:
-	if [[ "$(CURRENT_TAG)" == "" ]]; then $(MAKE) first_release; else $(MAKE) rev_release; fi
+	@if [[ "$(CURRENT_TAG)" == "" ]]; then $(MAKE) first_release; else $(MAKE) rev_release; fi
