@@ -8,20 +8,21 @@ import (
 	"github.com/pthomison/errcheck"
 )
 
-// , w http.ResponseWriter, r *http.Request
+type IDView struct {
+	ID uint
+}
 
-func Index[T any](c dbutils.DBClient) func(http.ResponseWriter, *http.Request) {
+func Index(c dbutils.DBClient, t interface{}) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		ids := dbutils.Query[T](c.DB().Select("id"))
+		ids := dbutils.Query[IDView](c.DB().Model(&t).Select("ID"))
 
 		json, err := json.Marshal(ids)
 		errcheck.Check(err)
 
 		_, err = w.Write(json)
 		errcheck.Check(err)
-
 	}
 }
 

@@ -25,6 +25,8 @@ github.com/mattn/go-sqlite3 v1.14.15/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pthomison/dbutils v0.0.4 h1:1LabPf9OchsVtoJlLwyXm3W5ralkjZwAxxzb1g8iGSk=
 github.com/pthomison/dbutils v0.0.4/go.mod h1:Nal3UNmlzpFpyMn/Hyqj6n6+db6qL32zmYE5kqyUGL4=
+github.com/pthomison/dbutils v0.0.5 h1:bbqa9LdAhSicxSDlzIOMUgy1PB+02voIiw9cEYoFgPk=
+github.com/pthomison/dbutils v0.0.5/go.mod h1:yGfML2RPHhzH8BzwX31lGGXAqn2jlsTLfezWa4KoEPM=
 github.com/pthomison/errcheck v0.0.1 h1:kNM+1enjd9/DcNgVjdCMnkk0p5ApMPOUWcEHQ5M5cIQ=
 github.com/pthomison/errcheck v0.0.1/go.mod h1:vdRyOpyBi1XWzIJXe+8V+0/V4xPlFmlJVsIVpGxzylA=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=

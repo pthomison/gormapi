@@ -1,9 +1,10 @@
 package gormapi
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,11 +12,14 @@ import (
 	"github.com/pthomison/dbutils"
 	"github.com/pthomison/dbutils/sqlite"
 	"github.com/pthomison/errcheck"
-	"gorm.io/gorm"
+)
+
+const (
+	testObjCount = 10
 )
 
 type gormObject struct {
-	gorm.Model
+	ID uint
 
 	StringData  string  `json:"string_data,omitempty"`
 	IntegerData int     `json:"integer_data,omitempty"`
@@ -28,7 +32,7 @@ func createTestData() *sqlite.SQLiteClient {
 	client := sqlite.New(":memory:")
 	dbutils.Migrate(client, &gormObject{})
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < testObjCount; i++ {
 		dbutils.Create(client, []gormObject{
 			gormObject{
 				StringData:  fmt.Sprintf("stringdata %v", i),
@@ -46,22 +50,41 @@ func TestIndex(t *testing.T) {
 
 	client := createTestData()
 
-	// objs := dbutils.SelectAll[gormObject](client)
+	objs := dbutils.SelectAll[gormObject](client)
 
-	// fmt.Printf("%+v\n", objs)
-
-	ts := httptest.NewServer(http.HandlerFunc(Index[gormObject](client)))
+	ts := httptest.NewServer(http.HandlerFunc(Index(client, &gormObject{})))
 	defer ts.Close()
 
 	res, err := http.Get(ts.URL)
 	errcheck.CheckTest(err, t)
 
-	greeting, err := io.ReadAll(res.Body)
+	indexBytes, err := io.ReadAll(res.Body)
 	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
+	errcheck.CheckTest(err, t)
+
+	index := make([]IDView, testObjCount)
+
+	err = json.Unmarshal(indexBytes, &index)
+	errcheck.CheckTest(err, t)
+
+	if len(objs) != len(index) {
+		errcheck.CheckTest(errors.New("mismatch in index data lengths"), t)
 	}
 
-	fmt.Printf("%s", greeting)
+	checkData := make([]IDView, testObjCount)
+
+	for i := 0; i < testObjCount; i++ {
+		checkData[i].ID = uint(i + 1)
+	}
+
+	checkJson, err := json.Marshal(checkData)
+	errcheck.CheckTest(err, t)
+
+	if string(checkJson) != string(indexBytes) {
+		fmt.Println(string(checkJson))
+		fmt.Println(string(indexBytes))
+
+		errcheck.CheckTest(errors.New("mismatch in index return data"), t)
+	}
 
 }
